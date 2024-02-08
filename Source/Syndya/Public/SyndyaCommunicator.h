@@ -38,16 +38,16 @@ public:
 
 	USyndyaCommunicator();
 
-	UFUNCTION(BlueprintCallable, Category = Socket)
+	UFUNCTION(BlueprintCallable, Category="MatchMaking")
 	void StartSearchingForMatch();
 
-	UFUNCTION(BlueprintCallable, Category = Socket)
+	UFUNCTION(BlueprintCallable, Category="MatchMaking")
 	void StopSearchingForMatch();
 
-	UFUNCTION(BlueprintCallable, Category = Socket)
+	UFUNCTION(BlueprintCallable, Category="MatchMaking")
 	void SendMetadata(FString Key, FString Value);
 
-	UFUNCTION(BlueprintCallable, Category="Status")
+	UFUNCTION(BlueprintCallable, Category="Websocket")
 	ESyndyaSocketStatus GetStatus() const;
 
 	FOnMatchFoundDelegate OnMatchFound;

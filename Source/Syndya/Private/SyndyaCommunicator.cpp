@@ -16,7 +16,9 @@ void USyndyaCommunicator::StartSearchingForMatch()
     if (GetStatus() != ESyndyaSocketStatus::SSS_NotConnected)
         StopSearchingForMatch();
 
-    Socket = FWebSocketsModule::Get().CreateWebSocket(ServerURL, TEXT("ws"));
+    FString FullURL = FString::Printf(TEXT("ws://%s"), *ServerURL);
+    UE_LOG(LogTemp, Display, TEXT("Connecting to Syndya service at %s"), *FullURL);
+    Socket = FWebSocketsModule::Get().CreateWebSocket(FullURL, TEXT("ws"));
 
 	Socket->OnConnected().AddLambda([this]() -> void {
         UE_LOG(LogTemp, Display, TEXT("Syndya Socket Connection Established"));
@@ -41,6 +43,7 @@ void USyndyaCommunicator::StartSearchingForMatch()
 	});
 
 	Socket->OnMessage().AddLambda([this](const FString & Message) -> void {
+        UE_LOG(LogTemp, Display, TEXT("[WEBSOCKET]<<%s"), *Message);
 		HandleMessage(Message);
 	});
 
@@ -48,9 +51,9 @@ void USyndyaCommunicator::StartSearchingForMatch()
 		
 	// });
 
-	// Socket->OnMessageSent().AddLambda([this](const FString& MessageString) -> void {
-		
-	// });
+	Socket->OnMessageSent().AddLambda([this](const FString& MessageString) -> void {
+		UE_LOG(LogTemp, Display, TEXT("[WEBSOCKET]>>%s"), *MessageString);
+	});
 
 	Socket->Connect();
 }
@@ -90,6 +93,7 @@ void USyndyaCommunicator::SendPendingMetadatas()
         FString Message = FString::Printf(TEXT("meta %s=%s"), *Data.Key, *Data.Value);
         Socket->Send(Message);
     }
+    PendingMetadata.Reset();
 }
 
 void USyndyaCommunicator::ClearSearch(bool CloseSocket)
